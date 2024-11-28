@@ -12,6 +12,11 @@ export default function Home() {
             InputとCombobox
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link href="/dialog" className="flex justify-center items-center p-2">
+            Dialogについて
+          </Link>
+        </li>
       </ul>
     </div>
   );
