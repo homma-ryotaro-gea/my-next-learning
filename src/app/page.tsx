@@ -25,6 +25,14 @@ export default function Home() {
             Comboboxを使用したForm
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/rhf-usefieldarray"
+            className="flex justify-center items-center p-2"
+          >
+            react-hook-form:useFieldArray
+          </Link>
+        </li>
       </ul>
     </div>
   );
