@@ -17,13 +17,13 @@ const RHFUseFieldArrayPage = () => {
     formState,
   } = useForm<{
     user_id: string;
-    main: { id: string; firstName: string; lastName: string }[];
-    sub: { id: string; firstName: string; lastName: string }[];
+    main: { firstName: string; lastName: string }[];
+    sub: { firstName: string; lastName: string }[];
   }>({
     defaultValues: {
       user_id: "1",
-      main: main_user ? [{ id: "1", firstName: "山田", lastName: "太郎" }] : [],
-      sub: [],
+      main: main_user ? [{ firstName: "山田", lastName: "太郎" }] : [],
+      sub: [{ firstName: "山田", lastName: "太郎" }],
     },
   });
   const { fields: mainFields, remove: mainRemove } = useFieldArray({
@@ -65,7 +65,8 @@ const RHFUseFieldArrayPage = () => {
         onSubmit={handleSubmit((data) => console.log(data))}
         className="w-full"
       >
-        <ul className="flex flex-col items-center">
+        <p>メイン担当者</p>
+        <ul>
           {mainFields.map((item, index) => (
             <li key={item.id} className="grid grid-cols-3 gap-2">
               <Input {...register(`main.${index}.firstName`)} />
@@ -84,6 +85,9 @@ const RHFUseFieldArrayPage = () => {
               </div>
             </li>
           ))}
+        </ul>
+        <p>サブ担当者</p>
+        <ul>
           {subFields.map((item, index) => (
             <li key={item.id} className="grid grid-cols-3 gap-2">
               <Input {...register(`sub.${index}.firstName`)} />
@@ -107,21 +111,16 @@ const RHFUseFieldArrayPage = () => {
           <Button
             onClick={() =>
               subAppend({
-                id: String(subFields.length + 1),
                 firstName: "",
                 lastName: "",
               })
             }
             className="bg-red-500 hover:bg-red-600"
           >
-            追加
+            サブ担当者追加
           </Button>
         )}
-        <Button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600"
-          size={"lg"}
-        >
+        <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
           送信
         </Button>
       </form>
