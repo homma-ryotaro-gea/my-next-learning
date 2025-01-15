@@ -46,6 +46,14 @@ export default function Home() {
             ラジオボタンとテーブル
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/display-setting"
+            className="flex justify-center items-center p-2"
+          >
+            表示項目設定
+          </Link>
+        </li>
       </ul>
     </div>
   );
