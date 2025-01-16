@@ -54,6 +54,14 @@ export default function Home() {
             表示項目設定
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/csv-import"
+            className="flex justify-center items-center p-2"
+          >
+            CSVインポート
+          </Link>
+        </li>
       </ul>
     </div>
   );
