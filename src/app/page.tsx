@@ -62,6 +62,14 @@ export default function Home() {
             CSVインポート
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/search-text-hold"
+            className="flex justify-center items-center p-2"
+          >
+            テキスト検索の文字列保持
+          </Link>
+        </li>
       </ul>
     </div>
   );
