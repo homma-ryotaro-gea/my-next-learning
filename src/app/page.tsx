@@ -70,6 +70,11 @@ export default function Home() {
             テキスト検索の文字列保持
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link href="/jotai" className="flex justify-center items-center p-2">
+            jotai
+          </Link>
+        </li>
       </ul>
     </div>
   );
