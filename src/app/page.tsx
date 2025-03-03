@@ -75,6 +75,14 @@ export default function Home() {
             jotai
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/table-pagination"
+            className="flex justify-center items-center p-2"
+          >
+            Tanstack Tableページネーション
+          </Link>
+        </li>
       </ul>
     </div>
   );
