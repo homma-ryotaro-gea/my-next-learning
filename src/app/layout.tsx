@@ -2,6 +2,7 @@ import { Home } from "lucide-react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -41,7 +42,9 @@ export default function RootLayout({
             </ul>
           </nav>
         </header>
-        <main className="max-w-[95%] mt-16 m-auto">{children}</main>
+        <NuqsAdapter>
+          <main className="max-w-[95%] mt-16 m-auto">{children}</main>
+        </NuqsAdapter>
       </body>
     </html>
   );

@@ -83,6 +83,11 @@ export default function Home() {
             Tanstack Tableページネーション
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link href="/swr" className="flex justify-center items-center p-2">
+            SWRについて
+          </Link>
+        </li>
       </ul>
     </div>
   );
