@@ -88,6 +88,11 @@ export default function Home() {
             SWRについて
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link href="/dnd" className="flex justify-center items-center p-2">
+            DnD
+          </Link>
+        </li>
       </ul>
     </div>
   );
