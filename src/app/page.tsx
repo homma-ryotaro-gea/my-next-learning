@@ -93,6 +93,14 @@ export default function Home() {
             DnD
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/dropdown-dialog"
+            className="flex justify-center items-center p-2"
+          >
+            dropdown&dialog
+          </Link>
+        </li>
       </ul>
     </div>
   );
