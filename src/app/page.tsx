@@ -101,6 +101,14 @@ export default function Home() {
             dropdown&dialog
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/date-picker"
+            className="flex justify-center items-center p-2"
+          >
+            DatePicker
+          </Link>
+        </li>
       </ul>
     </div>
   );
