@@ -109,6 +109,14 @@ export default function Home() {
             DatePicker
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/reload-querydelete?query=test"
+            className="flex justify-center items-center p-2"
+          >
+            ページリロード時にクエリパラメータを削除
+          </Link>
+        </li>
       </ul>
     </div>
   );
