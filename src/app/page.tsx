@@ -117,6 +117,14 @@ export default function Home() {
             ページリロード時にクエリパラメータを削除
           </Link>
         </li>
+        <li className="border rounded-md">
+          <Link
+            href="/testing"
+            className="flex justify-center items-center p-2"
+          >
+            Testing
+          </Link>
+        </li>
       </ul>
     </div>
   );
