@@ -125,6 +125,15 @@ export default function Home() {
             Testing
           </Link>
         </li>
+        {/* 無限スクロール */}
+        <li className="border rounded-md">
+          <Link
+            href="/infinite-scroll"
+            className="flex justify-center items-center p-2"
+          >
+            無限スクロール
+          </Link>
+        </li>
       </ul>
     </div>
   );
