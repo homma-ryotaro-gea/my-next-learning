@@ -148,7 +148,10 @@ const InfiniteScrollPage = () => {
   }, [comments]);
 
   return (
-    <div className="m-4 h-[500px] overflow-y-auto" ref={containerRef}>
+    <div
+      className="m-4 h-[calc(100vh-100px)] overflow-y-auto"
+      ref={containerRef}
+    >
       <div
         ref={loadMoreRef}
         className={cn(
