@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { useReloadQueryCleaner } from "@/hooks/useReloadQueryCleaner";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-const ReloadQueryDeletePage = () => {
+const ReloadQueryDeleteContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   useReloadQueryCleaner({
@@ -46,6 +47,14 @@ const ReloadQueryDeletePage = () => {
         </p>
       </div>
     </div>
+  );
+};
+
+const ReloadQueryDeletePage = () => {
+  return (
+    <Suspense>
+      <ReloadQueryDeleteContent />
+    </Suspense>
   );
 };
 

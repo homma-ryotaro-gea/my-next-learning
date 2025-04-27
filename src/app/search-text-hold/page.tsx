@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 // サンプルデータ
 const SAMPLE_ITEMS = [
@@ -16,7 +16,7 @@ const SAMPLE_ITEMS = [
 
 type Item = (typeof SAMPLE_ITEMS)[number];
 
-const SearchTextHoldPage = () => {
+const SearchTextHoldContent = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -37,7 +37,6 @@ const SearchTextHoldPage = () => {
   );
   const [searchTerm, setSearchTerm] = useState(displayTerm);
   const [filteredItems, setFilteredItems] = useState<Item[]>([...SAMPLE_ITEMS]);
-  // const [debouncedFn, setDebouncedFn] = useState<NodeJS.Timeout | null>(null);
 
   // 検索実行処理
   const performSearch = useCallback(
@@ -69,7 +68,9 @@ const SearchTextHoldPage = () => {
     setSearchTerm(currentTerm);
     performSearch(currentTerm);
   }, [searchParams, performSearch]);
+
   const [debouncedSearch] = useDebounce(handleSearch, 500);
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <Link href="/search-text-hold">検索テキスト保持</Link>
@@ -109,6 +110,14 @@ const SearchTextHoldPage = () => {
         </p>
       )}
     </div>
+  );
+};
+
+const SearchTextHoldPage = () => {
+  return (
+    <Suspense>
+      <SearchTextHoldContent />
+    </Suspense>
   );
 };
 

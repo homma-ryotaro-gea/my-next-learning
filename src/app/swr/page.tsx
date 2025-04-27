@@ -3,10 +3,11 @@ import ActivityTableSelectPeriod from "@/components/swr/ActivityTableSelectPerio
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "dayjs";
 import { parseAsString, useQueryState, useQueryStates } from "nuqs";
+import { Suspense } from "react";
 import type { DateRange } from "react-day-picker";
 import useSWR from "swr";
 
-const SWRPage = () => {
+const SWRContent = () => {
   let endpoint =
     "https://qiita.com/api/v2/items?page=1&per_page=100&query=user:qiita";
   let endpoint2 = "https://qiita.com/api/v2/items?page=1&per_page=100";
@@ -118,6 +119,14 @@ const SWRPage = () => {
         </TabsContent>
       </Tabs>
     </div>
+  );
+};
+
+const SWRPage = () => {
+  return (
+    <Suspense>
+      <SWRContent />
+    </Suspense>
   );
 };
 

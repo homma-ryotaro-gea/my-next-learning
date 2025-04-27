@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type MouseEvent, useState } from "react";
+import { useState } from "react";
 
 const SelectRowTableRadioPage = () => {
   const [selectedRow, setSelectedRow] = useState("");
@@ -28,7 +28,7 @@ const SelectRowTableRadioPage = () => {
   };
 
   const handleRadioClick = (
-    e: MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement>,
     id: number
   ) => {
     // イベントの伝播を防止

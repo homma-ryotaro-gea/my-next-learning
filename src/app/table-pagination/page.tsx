@@ -11,10 +11,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { type Person, makeData } from "./makeData";
 
-const TablePagination = () => {
+const TablePaginationContent = () => {
   const [data, setData] = useState(() => makeData());
 
   const searchParams = useSearchParams();
@@ -182,6 +182,14 @@ const TablePagination = () => {
         </select>
       </div>
     </div>
+  );
+};
+
+const TablePagination = () => {
+  return (
+    <Suspense>
+      <TablePaginationContent />
+    </Suspense>
   );
 };
 
