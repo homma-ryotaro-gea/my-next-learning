@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRInfinite, { type SWRInfiniteConfiguration } from "swr/infinite";
 
 // フックの引数の型定義
-type PropsType<T> = {
+type PropsType<T, P> = {
   path: string; // APIのエンドポイントURL
   options?: SWRInfiniteConfiguration; // SWRの設定オプション
   pageParamName?: string; // ページネーションのクエリパラメータ名
   limitParamName?: string; // 1ページあたりの件数を指定するパラメータ名
   limitSize?: number; // 1ページあたりの件数
   queryParams?: Record<string, string>; // その他のクエリパラメータ
-  getIdFromData?: (data: T) => number | string | null; // IDを取得するためのコールバック関数
+  getIdFromData?: (data: P) => number | string | null; // IDを取得するためのコールバック関数
   keyName?: string; // データのキー名
 };
 
@@ -41,8 +41,6 @@ type PropsType<T> = {
  * @returns {Function} mutate - データを手動で更新する関数
  * @returns {boolean} isValidating - データ取得中かどうか
  * @returns {Array} data - 全ページのデータを結合した配列
- * @returns {boolean} isLoading - 初回ローディング中かどうか
- * @returns {boolean} isLoadingMore - 追加データ読み込み中かどうか
  * @returns {boolean} isEmpty - データが空かどうか
  * @returns {boolean} isReachingEnd - 最後のページに到達したかどうか
  * @returns {RefObject} containerRef - スクロールコンテナ用のref
@@ -50,9 +48,11 @@ type PropsType<T> = {
  * @returns {number | null} lastId - 前回データ読み込みした時の最後のID
  */
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export const useInfiniteScroll = <T extends { [key: string]: any }[]>(
-  props: PropsType<T>
+export const useInfiniteScroll = <
+  T,
+  P extends { results: T[]; count: number; next: boolean; previous: boolean }
+>(
+  props: PropsType<T, P>
 ) => {
   // Intersection Observer用のref
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -76,11 +76,12 @@ export const useInfiniteScroll = <T extends { [key: string]: any }[]>(
     limitParamName = "limit",
     limitSize = 20,
     queryParams,
+    getIdFromData,
     keyName = "id",
   } = props;
 
   // APIからデータを取得する関数
-  const fetcher = async (url: string): Promise<T> => {
+  const fetcher = async (url: string): Promise<P> => {
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -93,13 +94,6 @@ export const useInfiniteScroll = <T extends { [key: string]: any }[]>(
       throw error;
     }
   };
-  // new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     fetch(url)
-  //       .then((res) => res.json())
-  //       .then((data: T) => resolve(data));
-  //   }, 500);
-  // });
 
   // クエリパラメータを文字列に変換する関数
   const getQueryParams = () => {
@@ -112,9 +106,9 @@ export const useInfiniteScroll = <T extends { [key: string]: any }[]>(
   const query = getQueryParams();
 
   // SWRInfiniteのキー生成関数
-  const getKey = (pageIndex: number, previousPageData: T | null) => {
+  const getKey = (pageIndex: number, previousPageData: P | null) => {
     // 前のページが空の場合、これ以上データがないのでnullを返す
-    if (previousPageData && !previousPageData.length) return null;
+    if (previousPageData && !previousPageData.next) return null;
     // APIのURLを生成
     return `${path}?${pageParamName}=${
       pageIndex + 1
@@ -134,20 +128,22 @@ export const useInfiniteScroll = <T extends { [key: string]: any }[]>(
   // 各種状態を管理
   const isEmpty = !fetchData || fetchData.length === 0; // データが空
   const isReachingEnd = // 最後のページに到達したかどうか
-    isEmpty ||
-    (fetchData && fetchData[fetchData.length - 1]?.length < limitSize);
+    isEmpty || (fetchData && !fetchData[fetchData.length - 1]?.next);
 
   // 全ページのデータを1つの配列にまとめる
-  const data = useMemo<T>(() => {
-    if (!fetchData) return [] as unknown as T;
-    return fetchData.flat().reverse() as unknown as T;
+  const data = useMemo<T[]>(() => {
+    if (!fetchData) return [];
+    const allResults = fetchData.flatMap((page) => page.results);
+    return [...allResults].reverse();
   }, [fetchData]);
 
   // データが更新された時に最後のIDを更新
   useEffect(() => {
-    // データが空でない場合は最後のIDを更新
     if (data.length > 0) {
-      setLastId(data[0][keyName]);
+      const lastItem = data[0] as Record<string, unknown>;
+      if (keyName in lastItem) {
+        setLastId(Number(lastItem[keyName]));
+      }
     }
   }, [data, keyName]);
 
