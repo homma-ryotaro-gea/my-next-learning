@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRInfinite, { type SWRInfiniteConfiguration } from "swr/infinite";
 
 // フックの引数の型定義
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type PropsType<T, P> = {
-  path: string; // APIのエンドポイントURL
+  path: string | null; // APIのエンドポイントURL
   options?: SWRInfiniteConfiguration; // SWRの設定オプション
   pageParamName?: string; // ページネーションのクエリパラメータ名
   limitParamName?: string; // 1ページあたりの件数を指定するパラメータ名
   limitSize?: number; // 1ページあたりの件数
   queryParams?: Record<string, string>; // その他のクエリパラメータ
-  getIdFromData?: (data: P) => number | string | null; // IDを取得するためのコールバック関数
   keyName?: string; // データのキー名
 };
 
@@ -58,11 +58,19 @@ export const useInfiniteScroll = <
   const observerRef = useRef<IntersectionObserver | null>(null);
   // 次のページを読み込むトリガーとなる要素のref
   const loadMoreRef = useRef<HTMLDivElement>(null);
-
+  // 前のページを読み込むトリガーとなる要素のref
+  const loadPreviousRef = useRef<HTMLDivElement>(null);
   // 前回データ読み込みした時の最後のIDを状態管理
   const [lastId, setLastId] = useState<number | null>(null);
+  // 前回データ読み込みした時の最初のIDを状態管理
+  const [firstId, setFirstId] = useState<number | null>(null);
+  // 前のlastIdを管理するstate
+  const [previousLastId, setPreviousLastId] = useState<number | null>(null);
+  // 前のfirstIdを管理するstate
+  const [previousFirstId, setPreviousFirstId] = useState<number | null>(null);
 
   // propsのデフォルト値を設定
+
   const {
     path,
     options = {
@@ -76,14 +84,18 @@ export const useInfiniteScroll = <
     limitParamName = "limit",
     limitSize = 20,
     queryParams,
-    getIdFromData,
     keyName = "id",
   } = props;
+  console.log("path", path);
+
+  const backendURL = "http://localhost:8000";
 
   // APIからデータを取得する関数
   const fetcher = async (url: string): Promise<P> => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -108,11 +120,24 @@ export const useInfiniteScroll = <
   // SWRInfiniteのキー生成関数
   const getKey = (pageIndex: number, previousPageData: P | null) => {
     // 前のページが空の場合、これ以上データがないのでnullを返す
-    if (previousPageData && !previousPageData.next) return null;
+    if (
+      previousPageData &&
+      !previousPageData.next &&
+      !previousPageData.previous
+    )
+      return null;
+    if (!path) return null;
+
+    console.log(
+      `${backendURL}${path}?${pageParamName}=${
+        pageIndex + 1
+      }&${limitParamName}=${limitSize}${query ? `&${query}` : ""}`
+    );
+
     // APIのURLを生成
-    return `${path}?${pageParamName}=${
+    return `${backendURL}${path}?${pageParamName}=${
       pageIndex + 1
-    }&${limitParamName}=${limitSize}&${query}`;
+    }&${limitParamName}=${limitSize}${query ? `&${query}` : ""}`;
   };
 
   // SWRInfiniteフックを使用してデータを取得
@@ -125,10 +150,18 @@ export const useInfiniteScroll = <
     isValidating, // データ取得中かどうか
   } = useSWRInfinite(getKey, fetcher, options);
 
+  // 次ページがあるかどうか
+  const hasNextPage = fetchData?.[fetchData.length - 1]?.next;
+
+  const hasPreviousPage = fetchData?.[fetchData.length - 1]?.previous;
+
+  // 現在のページ
+  const currentPage = fetchData?.[fetchData.length - 1]?.currentPage;
+
   // 各種状態を管理
   const isEmpty = !fetchData || fetchData.length === 0; // データが空
-  const isReachingEnd = // 最後のページに到達したかどうか
-    isEmpty || (fetchData && !fetchData[fetchData.length - 1]?.next);
+  const isReachingEnd = isEmpty || !hasNextPage; // 最後のページに到達したかどうか
+  const isReachingStart = isEmpty || !hasPreviousPage; // 最初のページに到達したかどうか
 
   // 全ページのデータを1つの配列にまとめる
   const data = useMemo<T[]>(() => {
@@ -138,13 +171,25 @@ export const useInfiniteScroll = <
   }, [fetchData]);
 
   // データが更新された時に最後のIDを更新
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (data.length > 0) {
       const lastItem = data[0] as Record<string, unknown>;
+      const firstItem = data[data.length - 1] as Record<string, unknown>;
+      console.log("lastItem", lastItem);
+      console.log("firstItem", firstItem);
       if (keyName in lastItem) {
         setLastId(Number(lastItem[keyName]));
+        // 前回のlastIdを更新
+        setPreviousLastId(lastId);
+      }
+      if (keyName in firstItem) {
+        setFirstId(Number(firstItem[keyName]));
+        // 前回のfirstIdを更新
+        setPreviousFirstId(firstId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, keyName]);
 
   // Intersection Observerの設定
@@ -162,7 +207,13 @@ export const useInfiniteScroll = <
         const [entry] = entries;
 
         // 条件を満たした場合に次のページを読み込む
-        if (entry.isIntersecting && !isReachingEnd && !isValidating && data) {
+        if (
+          entry.isIntersecting &&
+          !isReachingEnd &&
+          !isValidating &&
+          data &&
+          hasNextPage
+        ) {
           setSize((prevSize) => prevSize + 1);
         }
       },
@@ -173,37 +224,83 @@ export const useInfiniteScroll = <
     observerRef.current = observer;
 
     // クリーンアップ関数
+    // eslint-disable-next-line consistent-return
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
-  }, [isReachingEnd, isValidating, setSize, data]);
+  }, [isReachingEnd, isValidating, setSize, data, hasNextPage]);
+
+  // 前のページを読み込むためのIntersection Observerの設定
+  useEffect(() => {
+    if (!loadPreviousRef.current) return;
+
+    // 既存のオブザーバーをクリーンアップ
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    // 新しいオブザーバーを作成
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+
+        // 条件を満たした場合に前のページを読み込む
+        if (
+          entry.isIntersecting &&
+          !isReachingStart &&
+          !isValidating &&
+          data &&
+          hasPreviousPage
+        ) {
+          // 現在のページ数を取得し、1を引いて前のページを読み込む
+          setSize((prevSize) => Math.max(0, prevSize - 1));
+        }
+      },
+      { threshold: 0.5 } // 要素が50%表示されたときに発火
+    );
+
+    observer.observe(loadPreviousRef.current);
+    observerRef.current = observer;
+
+    // クリーンアップ関数
+    // eslint-disable-next-line consistent-return
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isReachingStart, isValidating, setSize, data, hasPreviousPage]);
 
   // スクロール位置を管理するref
   const containerRef = useRef<HTMLDivElement>(null);
   // 最新のコメントの位置を特定するref
   const lastCommentRef = useRef<HTMLDivElement>(null);
+  // 最初のコメントの位置を特定するref
+  const firstCommentRef = useRef<HTMLDivElement>(null);
 
   // スクロール位置の制御
   useEffect(() => {
     if (!containerRef.current) return;
-
-    // 初期表示時は一番下までスクロール
-    if (data.length <= limitSize) {
-      containerRef.current.scrollTo({
-        top: containerRef.current.scrollHeight,
-      });
-      return;
-    }
+    // // 初期表示時は一番下までスクロール
+    // if (previousLastId === null) {
+    //   containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    //   return;
+    // }
 
     // データ追加時は最新のコメントまでスクロール
-    if (lastCommentRef.current) {
+    if (lastCommentRef.current && lastId !== previousLastId) {
       lastCommentRef.current.scrollIntoView({
         block: "center", // 要素が画面中央に来るようにスクロール
       });
     }
-  }, [data, limitSize]);
+    if (firstCommentRef.current && firstId !== previousFirstId) {
+      firstCommentRef.current.scrollIntoView({
+        block: "center", // 要素が画面中央に来るようにスクロール
+      });
+    }
+  }, [lastId, previousLastId, firstId, previousFirstId]);
 
   // フックから返す値
   return {
@@ -220,6 +317,14 @@ export const useInfiniteScroll = <
     isReachingEnd,
     containerRef,
     lastCommentRef,
+    firstCommentRef,
     lastId,
+    previousLastId,
+    hasNextPage,
+    hasPreviousPage,
+    loadPreviousRef,
+    isReachingStart,
+    firstId,
+    previousFirstId,
   };
 };
