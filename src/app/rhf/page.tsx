@@ -1,14 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -17,51 +18,131 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
+	username: z.string().min(2, {
+		message: "Username must be at least 2 characters.",
+	}),
+	items: z.array(z.string()).refine((value) => value.some((item) => item), {
+		message: "You have to select at least one item.",
+	}),
 });
 
+const items = [
+	{
+		id: "recents",
+		label: "Recents",
+	},
+	{
+		id: "home",
+		label: "Home",
+	},
+	{
+		id: "applications",
+		label: "Applications",
+	},
+	{
+		id: "desktop",
+		label: "Desktop",
+	},
+	{
+		id: "downloads",
+		label: "Downloads",
+	},
+	{
+		id: "documents",
+		label: "Documents",
+	},
+] as const;
+
 const RHFPage = () => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      username: "shadcn",
-    },
-  });
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-  }
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
-      </form>
-    </Form>
-  );
+	const form = useForm<z.infer<typeof FormSchema>>({
+		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			username: "shadcn",
+			items: ["recents", "home"],
+		},
+	});
+	function onSubmit(data: z.infer<typeof FormSchema>) {
+		console.log(data);
+		toast({
+			title: "You submitted the following values:",
+			description: (
+				<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+					<code className="text-white">{JSON.stringify(data, null, 2)}</code>
+				</pre>
+			),
+		});
+	}
+	return (
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+				<FormField
+					control={form.control}
+					name="username"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Username</FormLabel>
+							<FormControl>
+								<Input placeholder="shadcn" {...field} />
+							</FormControl>
+							<FormDescription>
+								This is your public display name.
+							</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="items"
+					render={() => (
+						<FormItem>
+							<div className="mb-4">
+								<FormLabel className="text-base">Sidebar</FormLabel>
+								<FormDescription>
+									Select the items you want to display in the sidebar.
+								</FormDescription>
+							</div>
+							{items.map((item) => (
+								<FormField
+									key={item.id}
+									control={form.control}
+									name="items"
+									render={({ field }) => {
+										return (
+											<FormItem
+												key={item.id}
+												className="flex flex-row items-center gap-2"
+											>
+												<FormControl>
+													<Checkbox
+														checked={field.value?.includes(item.id)}
+														onCheckedChange={(checked) => {
+															return checked
+																? field.onChange([...field.value, item.id])
+																: field.onChange(
+																		field.value?.filter(
+																			(value) => value !== item.id,
+																		),
+																	);
+														}}
+													/>
+												</FormControl>
+												<FormLabel className="text-sm font-normal">
+													{item.label}
+												</FormLabel>
+											</FormItem>
+										);
+									}}
+								/>
+							))}
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<Button type="submit">Submit</Button>
+			</form>
+		</Form>
+	);
 };
 
 export default RHFPage;
