@@ -150,6 +150,14 @@ export default function Home() {
 						テーブルのヘッダーを固定
 					</Link>
 				</li>
+				<li className="border rounded-md">
+					<Link
+						href="/document-export"
+						className="flex justify-center items-center p-2"
+					>
+						Wordファイルのエクスポート
+					</Link>
+				</li>
 			</ul>
 		</div>
 	);
