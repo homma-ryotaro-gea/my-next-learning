@@ -10,6 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { useState } from "react";
+import { createTw } from "react-pdf-tailwind";
 
 // 出力用コンポーネント
 // Create styles
@@ -25,15 +26,23 @@ const styles = StyleSheet.create({
 	},
 });
 
+const tw = createTw({});
+
 // Create Document Component
 const MyDocument = () => (
 	<Document>
-		<Page size="A4" style={styles.page}>
-			<View style={styles.section}>
-				<Text>Section #1</Text>
+		<Page size="A4" style={tw("p-12")}>
+			<View style={tw("mt-12 px-8")}>
+				<Text style={tw("text-amber-600 text-2xl text-center")}>
+					Section #3
+				</Text>
 			</View>
-			<View style={styles.section}>
-				<Text>Section #2</Text>
+			<View style={tw("p-20 bg-gray-100 flex")}>
+				<Text style={tw("text-custom text-3xl")}>Section #1</Text>
+				<Text style={tw("text-custom text-3xl")}>Section #2</Text>
+			</View>
+			<View style={tw("mt-12 px-8 rotate-2")}>
+				<Text style={tw("text-amber-600 text-2xl")}>Section #3</Text>
 			</View>
 		</Page>
 	</Document>

@@ -45,6 +45,7 @@
 		"react-dom": "^18.3.1",
 		"react-hook-form": "^7.53.2",
 		"react-papaparse": "^4.4.0",
+		"react-pdf-tailwind": "^3.0.0",
 		"remeda": "^2.19.2",
 		"swr": "^2.3.2",
 		"tailwind-merge": "^2.5.4",
