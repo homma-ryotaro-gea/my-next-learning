@@ -1,30 +1,8 @@
 "use client";
-import type { MeetingMinutes } from "@/types/meeting-minutes";
-import {
-	Document,
-	Page,
-	StyleSheet,
-	Text,
-	View,
-	pdf,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { useState } from "react";
 import { createTw } from "react-pdf-tailwind";
-
-// 出力用コンポーネント
-// Create styles
-const styles = StyleSheet.create({
-	page: {
-		flexDirection: "column",
-		backgroundColor: "#E4E4E4",
-	},
-	section: {
-		margin: 10,
-		padding: 10,
-		flexGrow: 1,
-	},
-});
 
 const tw = createTw({});
 
@@ -49,7 +27,6 @@ const MyDocument = () => (
 );
 
 interface PdfGeneratorProps {
-	meetingMinutes: MeetingMinutes;
 	onExportStart?: () => void;
 	onExportComplete?: () => void;
 	onExportError?: (error: string) => void;
@@ -59,7 +36,6 @@ interface PdfGeneratorProps {
  * PDF文書生成コンポーネント
  */
 export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
-	meetingMinutes,
 	onExportStart,
 	onExportComplete,
 	onExportError,

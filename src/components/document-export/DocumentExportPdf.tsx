@@ -1,6 +1,5 @@
 "use client";
 
-import { sampleMeetingMinutes } from "@/data/sample-meeting-minutes";
 import { useState } from "react";
 import { PdfGenerator } from "./PdfGenerator";
 
@@ -58,7 +57,6 @@ const DocumentExportPdf = () => {
 			{/* エクスポート機能 */}
 			<div className="mb-6">
 				<PdfGenerator
-					meetingMinutes={sampleMeetingMinutes}
 					onExportStart={handleExportStart}
 					onExportComplete={handleExportComplete}
 					onExportError={handleExportError}
