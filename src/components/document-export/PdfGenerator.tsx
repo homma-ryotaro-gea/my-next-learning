@@ -13,7 +13,7 @@ interface PdfGeneratorProps {
 }
 
 /**
- * Word文書生成コンポーネント
+ * PDF文書生成コンポーネント
  */
 export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
 	meetingMinutes,
@@ -24,18 +24,21 @@ export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
 	const [isExporting, setIsExporting] = useState(false);
 
 	/**
-	 * 文書をエクスポートする
+	 * PDF文書をエクスポートする
 	 */
 	const handleExport = async () => {
 		try {
 			setIsExporting(true);
 			onExportStart?.();
 
-			// 文書を生成
+			// Word文書を生成（PDF変換のため）
 			const doc = buildMeetingMinutesDocument(meetingMinutes);
 
-			// ファイル名を生成
-			const fileName = generateFileName("議事録", meetingMinutes.date);
+			// ファイル名を生成（PDF用）
+			const fileName = generateFileName("議事録", meetingMinutes.date).replace(
+				".docx",
+				".pdf",
+			);
 
 			// ダウンロード実行
 			await downloadWordDocument(doc, fileName);
@@ -43,7 +46,9 @@ export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
 			onExportComplete?.();
 		} catch (error) {
 			const errorMessage =
-				error instanceof Error ? error.message : "エクスポートに失敗しました";
+				error instanceof Error
+					? error.message
+					: "PDFエクスポートに失敗しました";
 			onExportError?.(errorMessage);
 		} finally {
 			setIsExporting(false);

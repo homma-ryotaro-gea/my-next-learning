@@ -7,7 +7,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
@@ -32,7 +32,7 @@ const DatePickerPage = () => {
 					>
 						<CalendarIcon />
 						<span>
-							{date ? `${format(date, "yyyy/MM/dd")}` : "Pick a date"}
+							{date ? `${dayjs(date).format("YYYY/MM/DD")}` : "Pick a date"}
 						</span>
 					</Button>
 				</PopoverTrigger>
@@ -57,7 +57,7 @@ const DatePickerPage = () => {
 						<CalendarIcon />
 						<span>
 							{dateRange?.from && dateRange?.to
-								? `${format(dateRange.from, "yyyy/MM/dd")} - ${format(dateRange.to, "yyyy/MM/dd")}`
+								? `${dayjs(dateRange.from).format("YYYY/MM/DD")} - ${dayjs(dateRange.to).format("YYYY/MM/DD")}`
 								: "Pick a date"}
 						</span>
 					</Button>
