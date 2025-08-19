@@ -5,7 +5,7 @@ import { buildMeetingMinutesDocument } from "@/utils/documentBuilder";
 import { downloadWordDocument, generateFileName } from "@/utils/exportUtils";
 import { useState } from "react";
 
-interface DocumentGeneratorProps {
+interface PdfGeneratorProps {
 	meetingMinutes: MeetingMinutes;
 	onExportStart?: () => void;
 	onExportComplete?: () => void;
@@ -15,7 +15,7 @@ interface DocumentGeneratorProps {
 /**
  * Word文書生成コンポーネント
  */
-export const DocumentGenerator: React.FC<DocumentGeneratorProps> = ({
+export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
 	meetingMinutes,
 	onExportStart,
 	onExportComplete,
@@ -59,7 +59,7 @@ export const DocumentGenerator: React.FC<DocumentGeneratorProps> = ({
 				disabled={isExporting}
 				className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
-				{isExporting ? "エクスポート中..." : "Word文書をダウンロード"}
+				{isExporting ? "エクスポート中..." : "PDF文書をダウンロード"}
 			</button>
 		</div>
 	);

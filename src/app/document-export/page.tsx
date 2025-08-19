@@ -1,9 +1,11 @@
-import DocumentExport from "@/components/document-export/DocumentExport";
+import DocumentExportPdf from "@/components/document-export/DocumentExportPdf";
+import DocumentExportWord from "@/components/document-export/DocumentExportWord";
 
 const DocumentExportPage = () => {
 	return (
 		<div>
-			<DocumentExport />
+			<DocumentExportWord />
+			<DocumentExportPdf />
 		</div>
 	);
 };

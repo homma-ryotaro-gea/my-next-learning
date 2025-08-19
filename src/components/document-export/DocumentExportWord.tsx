@@ -2,12 +2,12 @@
 
 import { sampleMeetingMinutes } from "@/data/sample-meeting-minutes";
 import { useState } from "react";
-import { DocumentGenerator } from "./DocumentGenerator";
+import { WordGenerator } from "./WordGenerator";
 
 /**
  * 議事録エクスポートメインコンポーネント
  */
-const DocumentExport = () => {
+const DocumentExportWord = () => {
 	const [exportStatus, setExportStatus] = useState<{
 		isExporting: boolean;
 		error: string | null;
@@ -54,38 +54,9 @@ const DocumentExport = () => {
 	return (
 		<div className="max-w-4xl mx-auto p-6">
 			<h1 className="text-3xl font-bold mb-6">議事録 Word エクスポート</h1>
-
-			{/* 議事録プレビュー */}
-			<div className="mb-6">
-				<h2 className="text-xl font-semibold mb-3">議事録プレビュー</h2>
-				<div className="border border-gray-300 p-4 bg-gray-50 rounded">
-					<div className="space-y-2">
-						<h3 className="text-lg font-bold text-center">
-							{sampleMeetingMinutes.title}
-						</h3>
-						<p>
-							<strong>日時:</strong> {sampleMeetingMinutes.date}{" "}
-							{sampleMeetingMinutes.time}
-						</p>
-						<p>
-							<strong>場所:</strong> {sampleMeetingMinutes.location}
-						</p>
-						<p>
-							<strong>出席者:</strong> {sampleMeetingMinutes.attendingMembers}名
-							/ {sampleMeetingMinutes.totalMembers}名
-						</p>
-						<p>
-							<strong>議案数:</strong> {sampleMeetingMinutes.agendaItems.length}
-							件
-						</p>
-					</div>
-				</div>
-			</div>
-
 			{/* エクスポート機能 */}
 			<div className="mb-6">
-				<h2 className="text-xl font-semibold mb-3">エクスポート設定</h2>
-				<DocumentGenerator
+				<WordGenerator
 					meetingMinutes={sampleMeetingMinutes}
 					onExportStart={handleExportStart}
 					onExportComplete={handleExportComplete}
@@ -132,10 +103,6 @@ const DocumentExport = () => {
 				<h3 className="font-semibold mb-2">使用方法:</h3>
 				<ul className="list-disc list-inside space-y-1 text-sm">
 					<li>
-						<strong>スタイル設定:</strong>{" "}
-						タイトル、見出し、本文のフォントサイズと色をカスタマイズできます
-					</li>
-					<li>
 						<strong>エクスポート:</strong>{" "}
 						設定したスタイルで議事録をWord文書としてダウンロードできます
 					</li>
@@ -144,15 +111,9 @@ const DocumentExport = () => {
 						自動的に「議事録_日付.docx」の形式で保存されます
 					</li>
 				</ul>
-				<div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-					<p className="text-sm text-blue-800">
-						<strong>注意:</strong> フォントサイズは半ポイント単位（例: 20 =
-						10pt）で指定します。 色は16進数カラーコードで指定できます。
-					</p>
-				</div>
 			</div>
 		</div>
 	);
 };
 
-export default DocumentExport;
+export default DocumentExportWord;
