@@ -1,9 +1,43 @@
 "use client";
-
 import type { MeetingMinutes } from "@/types/meeting-minutes";
-import { buildMeetingMinutesDocument } from "@/utils/documentBuilder";
-import { downloadWordDocument, generateFileName } from "@/utils/exportUtils";
+import {
+	Document,
+	Page,
+	StyleSheet,
+	Text,
+	View,
+	pdf,
+} from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import { useState } from "react";
+
+// 出力用コンポーネント
+// Create styles
+const styles = StyleSheet.create({
+	page: {
+		flexDirection: "column",
+		backgroundColor: "#E4E4E4",
+	},
+	section: {
+		margin: 10,
+		padding: 10,
+		flexGrow: 1,
+	},
+});
+
+// Create Document Component
+const MyDocument = () => (
+	<Document>
+		<Page size="A4" style={styles.page}>
+			<View style={styles.section}>
+				<Text>Section #1</Text>
+			</View>
+			<View style={styles.section}>
+				<Text>Section #2</Text>
+			</View>
+		</Page>
+	</Document>
+);
 
 interface PdfGeneratorProps {
 	meetingMinutes: MeetingMinutes;
@@ -28,23 +62,23 @@ export const PdfGenerator: React.FC<PdfGeneratorProps> = ({
 	 */
 	const handleExport = async () => {
 		try {
+			console.log("PDFエクスポート開始");
 			setIsExporting(true);
 			onExportStart?.();
 
-			// Word文書を生成（PDF変換のため）
-			const doc = buildMeetingMinutesDocument(meetingMinutes);
+			// PDFを生成してBlobに変換
+			const blob = await pdf(<MyDocument />).toBlob();
 
-			// ファイル名を生成（PDF用）
-			const fileName = generateFileName("議事録", meetingMinutes.date).replace(
-				".docx",
-				".pdf",
-			);
+			// ファイル名を生成
+			const fileName = `議事録_${new Date().toISOString().split("T")[0]}.pdf`;
 
 			// ダウンロード実行
-			await downloadWordDocument(doc, fileName);
+			saveAs(blob, fileName);
 
+			console.log("PDFエクスポート完了:", fileName);
 			onExportComplete?.();
 		} catch (error) {
+			console.error("PDFエクスポートエラー:", error);
 			const errorMessage =
 				error instanceof Error
 					? error.message
